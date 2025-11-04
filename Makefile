@@ -49,6 +49,9 @@ endif
 ifeq ($(BIND_ROCKSDB), 1)
 	LDFLAGS += -lrocksdb
 	SOURCES += $(wildcard rocksdb/*.cc)
+	CXXFLAGS += -I./
+else
+	CXXFLAGS += -I./
 endif
 
 ifeq ($(BIND_LMDB), 1)
@@ -61,7 +64,7 @@ ifeq ($(BIND_SQLITE), 1)
 	SOURCES += $(wildcard sqlite/*.cc)
 endif
 
-CXXFLAGS += -std=c++17 -Wall -pthread $(EXTRA_CXXFLAGS) -I./
+CXXFLAGS += -std=c++17 -Wall -pthread $(EXTRA_CXXFLAGS)
 LDFLAGS += $(EXTRA_LDFLAGS) -lpthread
 SOURCES += $(wildcard core/*.cc)
 OBJECTS += $(SOURCES:.cc=.o)

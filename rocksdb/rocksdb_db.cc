@@ -345,20 +345,24 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
     rocksdb::BlockBasedTableOptions table_options;
     size_t cache_size = std::stoul(props.GetProperty(PROP_CACHE_SIZE, PROP_CACHE_SIZE_DEFAULT));
     if (cache_size > 0) {
-      block_cache = rocksdb::NewLRUCache(cache_size);
+      rocksdb::LRUCacheOptions cache_opts;
+      cache_opts.capacity = cache_size;
+      block_cache = rocksdb::NewLRUCache(cache_opts);
       table_options.block_cache = block_cache;
     }
 #if ROCKSDB_MAJOR < 8
     size_t compressed_cache_size = std::stoul(props.GetProperty(PROP_COMPRESSED_CACHE_SIZE,
                                                                 PROP_COMPRESSED_CACHE_SIZE_DEFAULT));
     if (compressed_cache_size > 0) {
-      block_cache_compressed = rocksdb::NewLRUCache(compressed_cache_size);
+      rocksdb::LRUCacheOptions compressed_cache_opts;
+      compressed_cache_opts.capacity = compressed_cache_size;
+      block_cache_compressed = rocksdb::NewLRUCache(compressed_cache_opts);
       table_options.block_cache_compressed = block_cache_compressed;
     }
 #endif
     int bloom_bits = std::stoul(props.GetProperty(PROP_BLOOM_BITS, PROP_BLOOM_BITS_DEFAULT));
     if (bloom_bits > 0) {
-      table_options.filter_policy.reset(rocksdb::NewBloomFilterPolicy(bloom_bits));
+      table_options.filter_policy.reset(rocksdb::NewBloomFilterPolicy(bloom_bits, false));
     }
     opt->table_factory.reset(rocksdb::NewBlockBasedTableFactory(table_options));
 
