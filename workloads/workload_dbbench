@@ -1,0 +1,26 @@
+# YCSB Workload matching db_bench seekrandom configuration
+# Matches: --num=50000000 --value_size=1024 --key_size=16
+
+# Number of records
+recordcount=50000000
+operationcount=50000000
+workload=com.yahoo.ycsb.workloads.CoreWorkload
+
+# Key configuration (db_bench uses 16 byte keys)
+# YCSB generates keys as "user" + number, so fieldlength controls value size
+
+# Value configuration (1024 bytes total)
+# Using 1 field of 1024 bytes to match db_bench value_size
+fieldcount=1
+fieldlength=1024
+
+readallfields=true
+
+# seekrandom = read operations with random seeks
+readproportion=1.0
+updateproportion=0
+scanproportion=0
+insertproportion=0
+
+# Random distribution (closest to db_bench seekrandom)
+requestdistribution=uniform

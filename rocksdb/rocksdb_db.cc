@@ -15,6 +15,7 @@
 #include <rocksdb/cache.h>
 #include <rocksdb/filter_policy.h>
 #include <rocksdb/merge_operator.h>
+#include <rocksdb/statistics.h>
 #include <rocksdb/status.h>
 #include <rocksdb/utilities/options_util.h>
 #include <rocksdb/write_batch.h>
@@ -106,6 +107,12 @@ namespace {
 
   const std::string PROP_SYNC = "rocksdb.sync";
   const std::string PROP_SYNC_DEFAULT = "false";
+
+  const std::string PROP_MIN_WRITE_BUFFER_MERGE = "rocksdb.min_write_buffer_number_to_merge";
+  const std::string PROP_MIN_WRITE_BUFFER_MERGE_DEFAULT = "0";
+
+  const std::string PROP_STATISTICS = "rocksdb.statistics";
+  const std::string PROP_STATISTICS_DEFAULT = "false";
 
   static std::shared_ptr<rocksdb::Env> env_guard;
   static std::shared_ptr<rocksdb::Cache> block_cache;
@@ -307,6 +314,10 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
     if (val != 0) {
       opt->max_write_buffer_number = val;
     }
+    val = std::stoi(props.GetProperty(PROP_MIN_WRITE_BUFFER_MERGE, PROP_MIN_WRITE_BUFFER_MERGE_DEFAULT));
+    if (val != 0) {
+      opt->min_write_buffer_number_to_merge = val;
+    }
     val = std::stoi(props.GetProperty(PROP_COMPACTION_PRI, PROP_COMPACTION_PRI_DEFAULT));
     if (val != -1) {
       opt->compaction_pri = static_cast<rocksdb::CompactionPri>(val);
@@ -371,6 +382,9 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
     }
     if (props.GetProperty(PROP_OPTIMIZE_LEVELCOMP, PROP_OPTIMIZE_LEVELCOMP_DEFAULT) == "true") {
       opt->OptimizeLevelStyleCompaction();
+    }
+    if (props.GetProperty(PROP_STATISTICS, PROP_STATISTICS_DEFAULT) == "true") {
+      opt->statistics = rocksdb::CreateDBStatistics();
     }
     if (props.GetProperty(PROP_SYNC, PROP_SYNC_DEFAULT) == "true") {
       wopt_.sync = true;
