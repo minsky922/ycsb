@@ -114,6 +114,18 @@ namespace {
   const std::string PROP_STATISTICS = "rocksdb.statistics";
   const std::string PROP_STATISTICS_DEFAULT = "false";
 
+  const std::string PROP_ENABLE_INTRA_L0_COMPACTION = "rocksdb.enable_intra_l0_compaction";
+  const std::string PROP_ENABLE_INTRA_L0_COMPACTION_DEFAULT = "false";
+
+  const std::string PROP_PARALLEL_SPLIT_FLUSH = "rocksdb.parallel_split_flush";
+  const std::string PROP_PARALLEL_SPLIT_FLUSH_DEFAULT = "false";
+
+  const std::string PROP_TEA_ENABLE = "rocksdb.TEA_enable";
+  const std::string PROP_TEA_ENABLE_DEFAULT = "false";
+
+  const std::string PROP_FEA_ENABLE = "rocksdb.FEA_enable";
+  const std::string PROP_FEA_ENABLE_DEFAULT = "false";
+
   static std::shared_ptr<rocksdb::Env> env_guard;
   static std::shared_ptr<rocksdb::Cache> block_cache;
 #if ROCKSDB_MAJOR < 8
@@ -385,6 +397,12 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
     }
     if (props.GetProperty(PROP_STATISTICS, PROP_STATISTICS_DEFAULT) == "true") {
       opt->statistics = rocksdb::CreateDBStatistics();
+    }
+    if (props.GetProperty(PROP_ENABLE_INTRA_L0_COMPACTION, PROP_ENABLE_INTRA_L0_COMPACTION_DEFAULT) == "true") {
+      opt->enable_intra_l0_compaction = true;
+    }
+    if (props.GetProperty(PROP_PARALLEL_SPLIT_FLUSH, PROP_PARALLEL_SPLIT_FLUSH_DEFAULT) == "true") {
+      opt->parallel_split_flush = true;
     }
     if (props.GetProperty(PROP_SYNC, PROP_SYNC_DEFAULT) == "true") {
       wopt_.sync = true;
